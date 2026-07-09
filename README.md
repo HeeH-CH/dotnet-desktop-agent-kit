@@ -2,9 +2,9 @@
 
 [한국어 README](README.ko.md)
 
-A practical agent skill kit for building and refactoring .NET desktop applications with WinUI/WPF, MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP-assisted code analysis.
+A practical agent execution kit for building and refactoring .NET desktop applications with WinUI/WPF, MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP-assisted code analysis.
 
-This project helps AI coding agents make safer architectural decisions when working on C# desktop applications.
+This project helps AI coding agents make safer architectural decisions and carry changes through planning, scoped implementation, audit, and verification when working on C# desktop applications.
 
 ## Focus
 
@@ -14,6 +14,7 @@ This project helps AI coding agents make safer architectural decisions when work
 - Enforce Clean Architecture boundaries in desktop applications.
 - Isolate Microsoft Graph, file system, authentication, local storage, and external APIs behind adapters.
 - Use Roslyn MCP tools for semantic code navigation, dependency analysis, dead-code detection, and refactoring audits.
+- Route work across Codex, Claude, reusable rules, skills, workflows, specialist agents, and MCP tools at a high level.
 
 ## Why this exists
 
@@ -25,7 +26,7 @@ Most .NET agent kits and Clean Architecture examples are optimized for ASP.NET C
 - External SDKs can leak directly into presentation code.
 - Refactoring needs to preserve buildability and UI behavior step by step.
 
-This kit exists to give AI coding agents explicit guidance for those desktop-specific problems.
+This kit exists to give AI coding agents explicit guidance for those desktop-specific problems. It is meant to be used as a practical execution kit, not only as a project scaffold.
 
 ## Recommended application architecture
 
@@ -80,6 +81,29 @@ templates/                    # Copyable project templates
 docs/adr/                     # Architecture decision records
 ```
 
+## Execution surfaces
+
+Use the kit as a set of coordinated surfaces:
+
+- `AGENTS.md` and `.codex/AGENTS.md` define operating rules for Codex and other coding agents.
+- `CLAUDE.md` gives Claude Code a lightweight entrypoint into the same guidance.
+- `rules/` contains always-on architectural constraints for desktop code.
+- `workflows/` contains repeatable procedures for refactoring, verification, and runtime checks.
+- `skills/` contains callable task guides for common desktop architecture work.
+- `agents/` defines specialist agents for architecture, refactoring, quality audit, and build fixes.
+- MCP/tool routing tells agents when to prefer Roslyn MCP, Microsoft Learn/docs tools, Context7, WinUI plugin skills, and CommunityToolkit.Mvvm skills.
+
+## Upgrade surface
+
+The current upgrade turns the repository into a more complete execution kit. The planned and documented surfaces include:
+
+- Rules: `rules/app-edge-boundaries.md`, `rules/result-taxonomy.md`, `rules/parallel-wave.md`, and `rules/error-learning.md`.
+- Workflows: `workflows/parallel-wave.md`, `workflows/runtime-smoke.md`, `workflows/verify-change.md`, and `workflows/refactor-screen.md`.
+- Skills: `skills/winui-app-edge-boundaries/`, `skills/mvi-reducer-store/`, `skills/desktop-result-taxonomy/`, and `skills/desktop-composition-di/`.
+- Specialist agents: `agents/dotnet-desktop-architect.md`, `agents/mvvm-mvi-refactorer.md`, `agents/quality-auditor.md`, and `agents/build-fix-agent.md`.
+
+These surfaces should stay generic. Do not add product-specific tenant, workspace, internal URL, secret, or customer details.
+
 ## How to use
 
 Copy the pieces that match your AI coding tool and project:
@@ -89,6 +113,7 @@ Copy the pieces that match your AI coding tool and project:
 - Use `CLAUDE.md` for Claude Code.
 - Import selected files from `rules/`, `skills/`, `agents/`, and `workflows/` into your project.
 - Customize the examples to your real project structure.
+- For broad refactoring, start from the relevant workflow, load the related rules and skills, delegate to specialist agents only where useful, then verify with the narrowest meaningful checks.
 
 ## Roslyn MCP recommendation
 
@@ -104,7 +129,7 @@ For C# projects, prefer semantic analysis over blind text search where possible.
 
 ## Status
 
-This is an early v0.1 scaffold. The current goal is to establish the structure and vocabulary. Contributions are welcome, especially around:
+This is an early v0.1 execution kit. The current goal is to make desktop-agent work repeatable across rules, workflows, skills, specialist agents, and MCP/tool routing. Contributions are welcome, especially around:
 
 - WinUI 3 patterns
 - WPF patterns

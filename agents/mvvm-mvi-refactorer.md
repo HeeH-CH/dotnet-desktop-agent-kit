@@ -15,7 +15,12 @@ Refactoring agent for WinUI/WPF View, ViewModel, ViewState, and Intent flow.
 
 - `rules/winui-codebehind.md`
 - `rules/mvi-state-flow.md`
+- `rules/app-edge-boundaries.md`
+- `rules/result-taxonomy.md`
 - `skills/mvvm-mvi-refactoring/SKILL.md`
+- `skills/winui-app-edge-boundaries/SKILL.md`
+- `skills/mvi-reducer-store/SKILL.md`
+- `skills/desktop-result-taxonomy/SKILL.md`
 
 ## Output expectations
 

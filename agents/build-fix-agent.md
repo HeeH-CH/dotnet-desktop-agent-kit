@@ -19,6 +19,15 @@ Build and compiler diagnostics repair agent.
 - Do not introduce Infrastructure references into Domain or Application.
 - Re-run build after changes when possible.
 
+## Load these files
+
+- `rules/architecture-boundaries.md`
+- `rules/app-edge-boundaries.md`
+- `rules/result-taxonomy.md`
+- `skills/winui-app-edge-boundaries/SKILL.md`
+- `skills/desktop-result-taxonomy/SKILL.md`
+- `skills/desktop-composition-di/SKILL.md`
+
 ## Output expectations
 
 Report:

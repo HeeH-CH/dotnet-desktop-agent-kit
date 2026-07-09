@@ -24,6 +24,19 @@ Use Roslyn MCP where available:
 - dead code
 - public API surface
 
+## Load these files
+
+- `rules/architecture-boundaries.md`
+- `rules/winui-codebehind.md`
+- `rules/mvi-state-flow.md`
+- `rules/infrastructure-adapters.md`
+- `rules/app-edge-boundaries.md`
+- `rules/result-taxonomy.md`
+- `skills/winui-app-edge-boundaries/SKILL.md`
+- `skills/mvi-reducer-store/SKILL.md`
+- `skills/desktop-result-taxonomy/SKILL.md`
+- `skills/desktop-composition-di/SKILL.md`
+
 ## Output expectations
 
 Return a prioritized report:
