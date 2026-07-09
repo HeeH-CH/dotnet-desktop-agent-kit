@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+.vs/
+TestResults/
+artifacts/
+packages/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*.user
+
+# Secrets
+.env
+.env.*
+*.secret.json
+appsettings.Development.json
+local.settings.json
+
+# Logs
+*.log
+logs/
