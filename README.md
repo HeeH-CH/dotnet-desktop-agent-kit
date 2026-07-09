@@ -1,5 +1,7 @@
 # dotnet-desktop-agent-kit
 
+[한국어 README](README.ko.md)
+
 A practical agent skill kit for building and refactoring .NET desktop applications with WinUI/WPF, MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP-assisted code analysis.
 
 This project helps AI coding agents make safer architectural decisions when working on C# desktop applications.
