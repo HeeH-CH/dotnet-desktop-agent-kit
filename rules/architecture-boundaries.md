@@ -2,33 +2,41 @@
 
 ## Intent
 
-Prevent desktop applications from collapsing into UI-driven service code.
+Prevent Clean Architecture from becoming folder naming only.
+
+## Applies to
+
+Projects, namespaces, references, public contracts, examples, and refactors.
 
 ## Rule
 
-Keep dependencies flowing inward:
+Keep dependency direction inward: `App -> Application -> Domain`, `Infrastructure -> Application / Domain`, and `Domain -> no external dependencies`.
 
-```text
-App -> Application -> Domain
-Infrastructure -> Application / Domain
-Domain -> no external dependencies
-```
+## Allowed
 
-## Allowed references
+- ViewModel calls an Application UseCase.
+- Infrastructure implements an Application port.
+- Application DTOs expose app-level data, not SDK DTOs.
+- Domain contains framework-independent business concepts.
 
-- App may reference Application.
-- Application may reference Domain.
-- Infrastructure may reference Application and Domain.
-- Domain should reference only framework-independent primitives and domain-owned types.
+## Not allowed
 
-## Violations
+- Application references WinUI/WPF types.
+- Domain references Infrastructure, Graph SDK, HTTP clients, or DI containers.
+- ViewModel constructs SDK clients or adapters directly.
+- Clean Architecture is treated as folder naming only.
 
-- Domain references WinUI/WPF.
-- Domain references Microsoft Graph SDK.
-- Application references Infrastructure implementations.
-- ViewModel directly creates HTTP clients, Graph clients, file stores, or database objects.
-- Infrastructure types leak into ViewState.
+## Preferred pattern
+
+Classify each changed type by layer before editing. Split mixed types into Presentation state, Application flow, Domain concept, and Infrastructure adapter.
+
+## Anti-pattern
+
+Moving files into folders named Application and Domain while preserving the original UI/SDK dependencies.
 
 ## Agent verification
 
-Check project references, namespaces, constructor dependencies, and type usage. If Roslyn MCP is available, inspect the project graph and references before changing boundaries.
+- Inspect project references or Roslyn project graph.
+- Search for UI namespaces in Application/Domain.
+- Search for Infrastructure references from Domain.
+- Check ViewModels for SDK clients or adapters.

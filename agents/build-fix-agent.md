@@ -2,22 +2,37 @@
 
 ## Role
 
-Build and compiler diagnostics repair agent.
+Build and compiler diagnostic specialist for .NET desktop repositories.
 
 ## Use when
 
-- `dotnet build` fails
-- nullable warnings need cleanup
-- package versions conflict
-- project references are broken
-- generated refactoring created compile errors
+- Build fails.
+- Nullable warnings need cleanup.
+- Project references conflict.
+- Generated examples need compile-oriented adjustment.
 
-## Rules
+## Do not use when
 
-- Fix the smallest cause first.
-- Do not change architecture just to silence a compiler error.
-- Do not introduce Infrastructure references into Domain or Application.
-- Re-run build after changes when possible.
+- The fix requires a new architecture boundary decision.
+- A warning should be suppressed instead of fixed.
+
+## Load these rules
+
+- `rules/architecture-boundaries.md`
+- `rules/async-and-cancellation.md`
+- `rules/dependency-injection-composition-root.md`
+- `rules/verification.md`
+
+## Load these skills
+
+- `skills/verification/SKILL.md`
+- `skills/codex-workflow/SKILL.md`
+
+## Preferred tools
+
+- `dotnet build`.
+- `dotnet test`.
+- Roslyn diagnostics.
 
 ## Load these files
 
@@ -30,9 +45,9 @@ Build and compiler diagnostics repair agent.
 
 ## Output expectations
 
-Report:
+Fix the smallest cause, report command output, and note architecture impact.
 
-- root cause
-- changed files
-- remaining warnings/errors
-- architectural side effects
+## Failure modes to avoid
+
+- Adding forbidden project references just to satisfy compile errors.
+- Blocking UI thread to avoid async errors.

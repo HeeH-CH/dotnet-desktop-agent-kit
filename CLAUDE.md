@@ -1,20 +1,27 @@
 # CLAUDE.md
 
-Use `AGENTS.md` as the primary operating guide for this repository.
+Use `AGENTS.md` as the primary operating guide. This file exists so Claude Code users can find the same desktop-first rules used by Codex CLI.
 
-When working on this kit:
+## Working stance
 
-1. Keep guidance practical and desktop-specific.
-2. Avoid ASP.NET Core-only assumptions unless clearly marked as optional.
-3. Prefer WinUI/WPF, MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP examples.
-4. Do not include company-specific, tenant-specific, or private workflow details.
-5. Keep examples generic and reusable.
-6. Update rules, skills, agents, and workflows together when a concept crosses boundaries.
+- Treat this repository as a public agent skill kit, not a runnable sample app.
+- Keep guidance desktop-first: WinUI, WPF, MVVM, MVI-style state flow, Clean Architecture, Roslyn MCP.
+- Do not import backend-only ASP.NET Core assumptions unless clearly marked as out of scope or optional.
+- Keep all examples generic and public-safe.
+- When changing one concept, update the corresponding rule, skill, agent, workflow, and docs when applicable.
 
-Important files:
+## Load order
 
-- `AGENTS.md` - main agent guide
-- `rules/` - always-on rules
-- `skills/` - reusable task skills
-- `agents/` - specialist subagent definitions
-- `workflows/` - step-by-step execution guides
+1. `AGENTS.md`
+2. Relevant `rules/*.md`
+3. Relevant `skills/*/SKILL.md`
+4. Relevant `agents/*.md`
+5. Relevant `workflows/*.md`
+
+## Common tasks
+
+- Feature planning: `workflows/add-feature.md`
+- Screen refactoring: `workflows/refactor-screen.md`
+- Graph integration: `workflows/add-graph-integration.md`
+- Architecture audit: `workflows/audit-architecture.md`
+- PR preparation: `workflows/prepare-pr.md`

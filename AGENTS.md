@@ -1,23 +1,22 @@
 # AGENTS.md
 
-This repository defines an agent skill kit for .NET desktop application development.
+This repository defines the operating doctrine for a public, copyable .NET desktop AI coding-agent skill kit.
 
 ## Core objective
 
-Help AI coding agents build and refactor WinUI/WPF desktop applications using MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP-assisted analysis.
+Help AI coding agents build, extend, audit, and refactor WinUI/WPF desktop applications using MVVM, MVI-style intent/result/ViewState flow, Clean Architecture, Application UseCases and ports, Infrastructure adapters, and Roslyn MCP-assisted semantic analysis.
 
-The kit is generic. Do not encode product-specific tenant, workspace, account, or organization details in reusable guidance.
+The kit is generic. Do not encode product-specific tenant, workspace, account, organization, internal URL, or customer details in reusable guidance.
 
-## Core architecture
+## Architecture doctrine
 
-The default architecture has four conceptual layers:
+Keep the app shell thin. Keep ViewModels focused on state and user intents. Put business/application workflows in Application UseCases. Define external system boundaries as Application ports. Implement those ports in Infrastructure. Keep Domain pure.
 
-- App / Presentation
-- Application
-- Domain
-- Infrastructure
+```text
+View -> Command / Intent -> ViewModel -> UseCase -> Port -> Infrastructure Adapter -> Result -> Reducer / State update -> ViewState -> View
+```
 
-Dependency direction must remain inward.
+Dependency direction is non-negotiable:
 
 ```text
 App -> Application -> Domain
@@ -25,84 +24,27 @@ Infrastructure -> Application / Domain
 Domain -> no external dependencies
 ```
 
-WinUI 3 and Windows App SDK are the default desktop target for new Windows guidance. WPF remains supported when a project is WPF, when the user asks for WPF, or when migration/comparison work requires it.
-
 ## Layer responsibilities
 
 ### App / Presentation
 
-Owns:
-
-- WinUI/WPF views
-- XAML
-- code-behind limited to view-only concerns
-- ViewModels
-- ViewState
-- Commands
-- Intent dispatching
-- UI composition and navigation
-- App-edge authority for windows, dialogs, focus, clipboard, process launch, file pickers, and interactive auth surfaces
-
-Must not own:
-
-- business rules
-- Microsoft Graph SDK calls
-- persistence logic
-- HTTP/file/auth implementation details
+Owns WinUI/WPF Views, XAML, UI-only resources, ViewModels, ViewState, commands, intent dispatching, navigation, UI composition, and App-edge authority for windows, dialogs, focus, clipboard, process launch, file pickers, native handles, and interactive auth surfaces. It must not own business rules, Graph SDK calls, persistence implementation, or raw external SDK DTOs in ViewState.
 
 ### Application
 
-Owns:
-
-- UseCases
-- application services
-- ports/interfaces for external systems
-- DTOs and application models
-- orchestration
-- validation
-- application-level Result models
-
-Must not reference:
-
-- WinUI/WPF types
-- Infrastructure implementations
-- Microsoft Graph SDK directly
+Owns UseCases, ports/interfaces such as `ICalendarGateway`, `IPlannerGateway`, `ITodoGateway`, `IUserProfileGateway`, `IAuthTokenProvider`, request/response DTOs, orchestration, validation, cancellation propagation, and application-level Result/Error models. It must not reference WinUI/WPF, Infrastructure implementations, Microsoft Graph SDK, ViewModels, or XAML concepts.
 
 ### Domain
 
-Owns:
-
-- pure business concepts
-- value objects
-- domain rules
-- domain models
-- domain errors
-
-Must not reference:
-
-- WinUI/WPF
-- Microsoft Graph
-- HTTP clients
-- databases
-- file systems
-- dependency injection frameworks
+Owns pure business concepts, value objects, domain rules, framework-independent models, and domain errors. It must not reference Presentation, Application implementation details, Infrastructure, SDKs, databases, file systems, OS APIs, or DI containers.
 
 ### Infrastructure
 
-Owns:
-
-- Microsoft Graph adapter implementations
-- authentication adapters
-- local storage adapters
-- file system adapters
-- HTTP clients
-- platform-specific service implementations
-
-Infrastructure implements ports defined by Application or Domain.
+Owns Microsoft Graph adapter implementations, authentication/token providers, local storage, file access, external API clients, and mapping from external DTOs/exceptions to Application DTOs/errors. Infrastructure implements ports defined by Application or Domain and must not define UI state.
 
 ## Operating guide
 
-Use the reusable rules, workflows, and skills in this kit when they exist. Bundle-specific documents may be added over time; prefer the most specific local file before falling back to this summary.
+Use the reusable rules, workflows, and skills in this kit when they exist. Prefer the most specific local file before falling back to this summary.
 
 - Read `rules/architecture-boundaries.md` for layer ownership and dependency direction.
 - Read `rules/winui-codebehind.md` for view-only code-behind constraints.
@@ -116,50 +58,6 @@ Use the reusable rules, workflows, and skills in this kit when they exist. Bundl
 - Use `workflows/refactor-screen.md` for View, ViewModel, state, use case, and adapter cleanup.
 - Use `workflows/verify-change.md` for scoped verification planning.
 - Use `workflows/runtime-smoke.md` only when an interactive desktop smoke check is needed.
-- Use `skills/winui-app-edge-boundaries/SKILL.md` for window, XAML, dialog, platform handle, auth surface, and local OS authority decisions.
-- Use `skills/mvi-reducer-store/SKILL.md` for reducer/store purity and intent/result flow.
-- Use `skills/desktop-result-taxonomy/SKILL.md` for typed user-visible operation results.
-- Use `skills/desktop-composition-di/SKILL.md` for dependency injection and composition root decisions.
-
-## Tool and skill routing
-
-Use installed tools and skills in this order when they are available:
-
-- WinUI 3, Windows App SDK, XAML, binding, theming, packaging, UI testing, WPF migration, and Fluent design: winui plugin skills.
-- CommunityToolkit.Mvvm ViewModels, `[ObservableProperty]`, `[RelayCommand]`, validation, and command generation: `mvvm-toolkit`.
-- CommunityToolkit.Mvvm with dependency injection and `Microsoft.Extensions.DependencyInjection`: `mvvm-toolkit-di`.
-- CommunityToolkit.Mvvm messenger patterns: `mvvm-toolkit-messenger`.
-- Microsoft concepts, setup, limits, configuration, Windows App SDK, MSAL, Microsoft Graph, .NET, and official platform behavior: `microsoft-docs`, `microsoft-code-reference`, and the `microsoft-learn` MCP server.
-- C# semantic analysis, symbol/reference navigation, generated partial ViewModel relationships, diagnostics, and safe refactoring impact checks: the `roslyn` MCP server.
-- External library or API documentation, framework setup, migrations, package-specific behavior, and code examples: Context7 MCP. Resolve the library ID first unless the user already provided it.
-
-If a preferred tool is unavailable, state that briefly and fall back to official documentation, existing project patterns, and targeted text search.
-
-## App-edge authority
-
-Keep platform and UI authority at the App edge. ViewModels, Application, and Domain must not directly own or require:
-
-- `Window`, `XamlRoot`, `AppWindow`, `DispatcherQueue`, raw HWND, DWM/User32 interop, or similar platform handles.
-- Dialog, flyout, focus, pointer capture, keyboard routing, tray, storyboard, timer, or visual tree mutation authority.
-- Clipboard, file picker, process launch, shell integration, local OS integration, or native window placement authority.
-- MSAL/WAM parent-window routing or interactive authentication surfaces.
-
-Pass App-edge decisions through presenters, coordinators, factories, or ports that expose application-owned abstractions rather than raw platform types.
-
-## Result taxonomy
-
-User-visible operations should return typed results instead of plain `bool`, raw `Exception`, or direct `exception.Message` strings.
-
-Prefer result models that include:
-
-- action kind
-- status or severity
-- machine-readable failure reason
-- retry, reload, stale, cancelled, or partial-success classification when relevant
-- optional diagnostics log reference
-- optional user-message key or presentation hint
-
-Infrastructure should translate SDK, OS, network, auth, and storage failures into application-owned failure reasons. Presentation or App-edge presenters map those reasons to user-facing text.
 
 ## Non-negotiable rules
 
@@ -168,100 +66,88 @@ Infrastructure should translate SDK, OS, network, auth, and storage failures int
 - Do not reference WinUI/WPF types from Application or Domain.
 - Do not move App-edge authority into ViewModels, Application, or Domain.
 - Do not reference Infrastructure from Domain.
+- Do not expose external SDK DTOs in ViewState.
+- Do not treat Clean Architecture as folder naming only.
+- Do not introduce backend-only ASP.NET Core assumptions into desktop guidance.
 - Use Application ports for external systems.
-- Use UseCases for user-visible business actions.
+- Use UseCases for user-visible actions that involve IO, validation, branching, integration, or orchestration.
 - Use typed result taxonomy for user-visible action outcomes.
 - Use ViewState to represent screen state explicitly.
 - Use Intent-style methods or commands for user actions.
+- Propagate `CancellationToken` through async UseCase and adapter calls.
 - Keep each refactoring step buildable.
 - Prefer small, reversible changes.
+- Keep examples generic and public-safe.
+
+## Allowed and disallowed dependencies
+
+| From | Allowed | Not allowed |
+|---|---|---|
+| App / Presentation | Application, Domain, UI framework, CommunityToolkit.Mvvm | Graph SDK in ViewModels; business calls to Infrastructure implementations |
+| Application | Domain, BCL abstractions, application ports | WinUI/WPF, Infrastructure, Graph SDK, external SDK DTO contracts |
+| Domain | BCL and domain-owned types | Application, Infrastructure, UI, SDKs, DI containers |
+| Infrastructure | Application, Domain, external SDKs, OS/file/auth APIs | App/ViewModel references, ViewState, UI controls |
 
 ## MVI-style flow
 
-User interaction should follow this flow:
+1. View raises a command or event.
+2. ViewModel converts it to an explicit intent method.
+3. ViewModel updates ViewState to loading/optimistic state.
+4. ViewModel calls an Application UseCase.
+5. UseCase calls ports and returns Result.
+6. ViewModel reduces Result into ViewState.
+7. View observes ViewState through binding.
 
-```text
-View
- -> Command / Intent
- -> ViewModel
- -> UseCase
- -> Port
- -> Infrastructure Adapter
- -> Result
- -> Reducer / State update
- -> ViewState
- -> View
-```
+## Roslyn MCP usage policy
+
+When Roslyn MCP is available, prefer it before broad textual edits for C# code. Check project graph, symbol references, port/interface implementations, circular dependencies, diagnostics, dead code, public API surface, ViewModel references to Infrastructure or Graph SDK namespaces, Application/Domain references to WinUI/WPF namespaces, and Infrastructure DTO leakage into ViewState.
 
 Reducers and stores must stay pure. Reducers compute next state from current state plus intent/result. Stores dispatch and publish state. Async I/O, HTTP, SDK calls, database work, file access, and WinUI control mutation belong outside reducer/store boundaries.
 
-## Roslyn MCP usage
+If Roslyn MCP is unavailable, fall back to compiler diagnostics, `dotnet build`, `dotnet test`, and targeted text search. Report that semantic checks were unavailable.
 
-Before large changes, use Roslyn-based analysis where available:
+## Agent routing table
 
-- inspect project dependency graph
-- find symbol references
-- find implementations of ports
-- detect circular dependencies
-- inspect diagnostics
-- detect dead code
-- inspect public API surface
+| Situation | Primary agent |
+|---|---|
+| Choose architecture or layer placement | `agents/dotnet-desktop-architect.md` |
+| Clean ViewModel or code-behind | `agents/mvvm-mvi-refactorer.md` |
+| Add Microsoft Graph/M365 integration | `agents/graph-integration-specialist.md` |
+| Fix build or project references | `agents/build-fix-agent.md` |
+| Review UI state correctness | `agents/ui-state-reviewer.md` |
+| Design test strategy | `agents/test-strategy-agent.md` |
+| Maintain docs, rules, or workflows | `agents/documentation-maintainer.md` |
+| Audit after refactor | `agents/quality-auditor.md` |
 
-Prefer semantic analysis over blind text search.
+## Skill loading guide
 
-Load the relevant solution or workspace before relying on Roslyn answers. Treat Roslyn output as static analysis support, not a substitute for targeted build or test verification.
+Load only the skills needed for the task. Feature work usually uses `skills/feature-planning/SKILL.md`, `skills/usecase-design/SKILL.md`, and `skills/viewstate-design/SKILL.md`. Refactoring usually uses `skills/mvvm-mvi-refactoring/SKILL.md`, `skills/screen-refactoring/SKILL.md`, and `skills/verification/SKILL.md`. Graph work uses `skills/graph-adapter/SKILL.md`. Audits use `skills/roslyn-mcp-audit/SKILL.md`.
 
-## Agent roles
-
-### dotnet-desktop-architect
-
-Use for project structure, architecture boundaries, dependency direction, module placement, and deciding whether a feature belongs in App, Application, Domain, or Infrastructure.
-
-### mvvm-mvi-refactorer
-
-Use for ViewModel cleanup, code-behind removal, ViewState design, Intent design, Command design, and UI state consistency.
-
-### graph-integration-specialist
-
-Use for Microsoft Graph, Planner, Calendar, To Do, authentication, Graph DTO mapping, permission errors, and adapter boundaries.
-
-### quality-auditor
-
-Use for architecture audits, dependency violations, circular dependencies, dead code, naming inconsistencies, missing tests, and refactoring progress reports.
-
-### build-fix-agent
-
-Use for build errors, nullable warnings, package conflicts, project references, and compiler diagnostics.
+For app-edge concerns, use `skills/winui-app-edge-boundaries/SKILL.md`. For reducer/store design, use `skills/mvi-reducer-store/SKILL.md`. For user-visible result modeling, use `skills/desktop-result-taxonomy/SKILL.md`. For composition root and DI boundaries, use `skills/desktop-composition-di/SKILL.md`.
 
 ## Feature development workflow
 
-When adding a new feature:
-
-1. Identify the user action and screen impact.
-2. Define the Intent.
-3. Define or reuse the ViewState.
-4. Decide whether a UseCase is required.
-5. If external data is needed, define an Application Port.
-6. Implement the Infrastructure Adapter.
-7. Wire the ViewModel to the UseCase.
-8. Update the View binding.
-9. Verify build and dependency direction.
-10. Summarize the architectural impact.
+1. Identify the screen, user intent, and resulting state changes.
+2. Load `workflows/add-feature.md`.
+3. Decide whether the feature needs a UseCase.
+4. Define Application request/response models and ports before Infrastructure.
+5. Keep external SDK DTOs inside Infrastructure.
+6. Update ViewModel intents and ViewState.
+7. Bind the View to ViewState.
+8. Verify architecture, build, tests, links, and public safety.
 
 ## Refactoring workflow
 
-When refactoring existing code:
+1. Load `workflows/refactor-screen.md` or `workflows/migrate-code-behind.md`.
+2. Audit current responsibilities before editing.
+3. Use Roslyn MCP to find references and dependency violations when available.
+4. Move business/application flow to UseCases.
+5. Move SDK/file/auth/local-storage code to Infrastructure adapters.
+6. Replace scattered state flags with ViewState.
+7. Keep changes small and reversible.
+8. Document remaining debt.
 
-1. Audit current responsibilities.
-2. Identify code-behind logic.
-3. Identify ViewModel overreach.
-4. Identify direct Infrastructure usage from App/Application.
-5. Extract UseCases first.
-6. Extract Ports next.
-7. Move Graph/file/auth code to Infrastructure.
-8. Replace scattered mutable UI flags with explicit ViewState.
-9. Keep each step buildable.
-10. Document remaining debt.
+## Verification output format
 
 For broad or risky refactors, use a wave-based workflow:
 
@@ -272,15 +158,19 @@ For broad or risky refactors, use a wave-based workflow:
 5. Run the narrowest meaningful verification once the batch is internally consistent.
 6. Fix blocking audit or verification findings and re-audit narrowly.
 
-## Verification output
+```markdown
+## Verification
 
-After any meaningful change, report:
+| Check | Result | Notes |
+|---|---|---|
+| Build | pass/fail/not run | command and important output |
+| Tests | pass/fail/not run | scope |
+| Roslyn MCP | pass/fail/not available | project graph, references, diagnostics |
+| Architecture boundaries | pass/fail | violations or none |
+| ViewState/Intent flow | pass/fail | screen impact |
+| Public safety | pass/fail | sensitive info check |
+```
 
-- Build status
-- Changed files
-- Architecture boundary impact
-- ViewModel responsibility changes
-- UseCase changes
-- Adapter changes
-- Known risks
-- Follow-up recommendations
+## Public repo safety rules
+
+Never include company names, internal product names, tenant IDs, client secrets, real client IDs, private redirect URIs, private M365 organization details, private email addresses, production URLs, internal endpoints, screenshots with private data, or secrets hidden in examples. Use generic names such as `ExampleApp`, `ExampleGraphAdapter`, `YOUR_TENANT_ID`, `YOUR_CLIENT_ID`, and `example.invalid`.

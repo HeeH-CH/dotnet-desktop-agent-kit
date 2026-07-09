@@ -2,18 +2,28 @@
 
 Use this template as a project-level `AGENTS.md` for a WinUI 3 desktop app.
 
-Keep the guidance generic to this project. Do not add tenant, workspace, customer, or account-specific details unless the repository already treats them as non-secret project configuration.
+Keep the guidance generic to this project. Do not add tenant, workspace, customer, account, internal URL, or organization-specific details unless the repository already treats them as non-secret project configuration.
 
 ## Architecture
 
 This project uses WinUI 3 with Windows App SDK, MVVM, MVI-style state flow, and Clean Architecture.
 
 ```text
-App -> Application -> Domain
-Infrastructure -> Application / Domain
+ExampleApp.App              WinUI 3 views, XAML, ViewModels, ViewState, commands
+ExampleApp.Application      UseCases, ports, DTOs, Result models
+ExampleApp.Domain           Pure domain concepts and rules
+ExampleApp.Infrastructure   Graph, auth, files, local storage, external APIs
 ```
 
-Dependency direction is inward. Domain stays pure. Application owns use cases, ports, DTOs, validation, orchestration, and application-owned result models. Infrastructure implements ports for external SDKs, file/network/storage/auth, and platform services. App/Presentation owns WinUI views, XAML, code-behind, ViewModels, ViewState, commands, intent dispatch, composition, and navigation.
+Dependency direction:
+
+```text
+App -> Application -> Domain
+Infrastructure -> Application / Domain
+Domain -> no external dependencies
+```
+
+Domain stays pure. Application owns use cases, ports, DTOs, validation, orchestration, and application-owned result models. Infrastructure implements ports for external SDKs, file/network/storage/auth, and platform services. App/Presentation owns WinUI views, XAML, code-behind, ViewModels, ViewState, commands, intent dispatch, composition, and navigation.
 
 WPF guidance applies only when this repository is WPF, when the task explicitly asks for WPF, or when comparing/migrating between WPF and WinUI.
 
@@ -34,7 +44,7 @@ WPF guidance applies only when this repository is WPF, when the task explicitly 
 ## Flow
 
 ```text
-View -> Command/Intent -> ViewModel -> UseCase -> Port -> Adapter -> Result -> ViewState
+View -> Command/Intent -> ViewModel -> UseCase -> Port -> Adapter -> Result -> ViewState -> View
 ```
 
 Reducers and stores, when used, stay pure. Reducers compute next state from current state plus intent/result. Stores dispatch and publish. Async I/O, HTTP, SDK calls, database work, file access, and WinUI control mutation happen in use cases, controllers, effects, adapters, or App-edge services, then return typed results or intents.

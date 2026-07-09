@@ -1,57 +1,54 @@
 ---
 name: architecture-advisor
-description: Selects and explains architecture placement for .NET desktop features using WinUI/WPF, MVVM, MVI-style state flow, and Clean Architecture.
+description: Choose layer placement, dependency direction, and desktop Clean Architecture boundaries for WinUI/WPF work.
 ---
 
 # Architecture Advisor
 
 ## Purpose
 
-Use this skill when adding a feature, restructuring a project, or deciding where code belongs.
+Decide where a feature, type, dependency, or responsibility belongs before editing code.
 
-## Questions to answer
+## When to use
 
-1. Is the change UI-only, application workflow, domain rule, or infrastructure integration?
-2. Does the feature need external data?
-3. Does it need a new UseCase?
-4. Does it need a new Application port?
-5. Does it affect ViewState?
-6. Does it add a domain concept or only transform/display data?
-7. Can the change be made without violating dependency direction?
+- A feature touches more than one layer.
+- A ViewModel is gaining dependencies.
+- A project reference or namespace change is proposed.
 
-## Placement guide
+## Inputs
 
-| Concern | Place it in |
-|---|---|
-| XAML layout | App / Presentation |
-| Button command | ViewModel |
-| Loading/error/success state | ViewState |
-| User action workflow | Application UseCase |
-| Business rule | Domain |
-| Graph API call | Infrastructure Adapter |
-| SDK DTO mapping | Infrastructure or Application mapper boundary |
-| External system interface | Application Port |
+- Feature or refactor description.
+- Current project/folder structure.
+- Target framework and integrations.
+- Build or Roslyn MCP findings.
 
-## Recommendation format
+## Process
 
-Return:
+1. Restate the user intent and affected screen/feature.
+2. Classify each responsibility as App, Application, Domain, or Infrastructure.
+3. Identify ports needed for external systems.
+4. Check dependency direction before proposing files.
+5. Prefer a small, reversible change plan.
+6. List verification commands and Roslyn MCP checks.
 
-```markdown
-## Architecture Decision
+## Output format
 
-**Feature:** ...
-**Primary layer:** ...
-**Affected layers:** ...
-**New UseCases:** ...
-**New Ports:** ...
-**New Adapters:** ...
-**ViewState impact:** ...
-**Risks:** ...
-```
+Decision, file placement table, dependency impact, risks, and verification checklist.
 
 ## Anti-patterns
 
-- Putting everything in the ViewModel.
-- Adding a service without defining whether it is Application or Infrastructure.
-- Creating domain objects that depend on UI concepts.
-- Treating Clean Architecture as only a folder structure.
+- Choosing folders without checking references.
+- Putting SDK calls in ViewModels.
+- Over-designing Domain when the behavior is application orchestration.
+
+## Verification
+
+- Boundary table has no forbidden dependency.
+- UseCases and ports are named by user intent.
+- Infrastructure adapters are isolated.
+
+## Related rules
+
+- `rules/architecture-boundaries.md`
+- `rules/usecase-boundaries.md`
+- `rules/infrastructure-adapters.md`

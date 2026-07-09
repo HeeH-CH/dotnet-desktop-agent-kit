@@ -1,79 +1,53 @@
 ---
 name: clean-architecture-desktop
-description: Applies Clean Architecture to .NET desktop applications without assuming ASP.NET Core or web APIs.
+description: Apply Clean Architecture to desktop apps without backend-only assumptions.
 ---
 
-# Clean Architecture for Desktop Apps
+# Clean Architecture Desktop
 
-## Core idea
+## Purpose
 
-Desktop Clean Architecture uses App / Application / Domain / Infrastructure instead of Api / Application / Domain / Infrastructure.
+Translate Clean Architecture into WinUI/WPF realities: Views, ViewModels, UseCases, ports, adapters, and composition root.
 
-```text
-App / Presentation -> Application -> Domain
-Infrastructure -> Application / Domain
-```
+## When to use
 
-## Layer mapping
+- A user asks how to structure a desktop app.
+- A feature crosses UI and external integrations.
+- Application or Domain has UI references.
 
-### App / Presentation
+## Inputs
 
-- WinUI/WPF Views
-- ViewModels
-- ViewState
-- Commands
-- navigation
-- composition root
+- Solution/project graph.
+- Layer or namespace conventions.
+- Target feature.
+- Existing adapter and UseCase names.
 
-### Application
+## Process
 
-- UseCases
-- ports
-- validation
-- orchestration
-- application DTOs
-- Result models
+1. Identify each layer and current references.
+2. Find responsibilities in the wrong layer.
+3. Define allowed dependency direction.
+4. Move orchestration to Application and external implementations to Infrastructure.
+5. Keep Domain pure and small.
+6. Document composition-root exceptions.
 
-### Domain
+## Output format
 
-- pure business models
-- invariants
-- value objects
-- domain errors
+Layering recommendation, dependency diff, migration steps, and verification checks.
 
-### Infrastructure
+## Anti-patterns
 
-- Microsoft Graph
-- authentication
-- local storage
-- file system
-- HTTP APIs
-- platform adapters
-
-## UseCase guidance
-
-Create a UseCase when:
-
-- the action is user-visible and meaningful
-- the flow touches external systems
-- the ViewModel would otherwise become orchestration-heavy
-- the flow should be testable without UI
-
-Avoid UseCases for trivial UI-only state toggles.
-
-## Port guidance
-
-Create an Application port when:
-
-- Application needs data from an external system
-- the implementation may change
-- the dependency is hard to test directly
-- SDK types would otherwise leak inward
+- Treating Clean Architecture as only four folders.
+- Importing web API endpoint patterns into desktop guidance.
+- Creating a full DDD model for simple app state.
 
 ## Verification
 
-- Domain has no framework references.
-- Application has no Infrastructure references.
-- ViewModels depend on UseCases, not SDK clients.
-- Infrastructure implements ports.
-- External DTOs do not leak into ViewState.
+- Project graph matches allowed direction.
+- Application/Domain have no UI/SDK dependencies.
+- Composition root is the only broad reference point.
+
+## Related rules
+
+- `rules/architecture-boundaries.md`
+- `rules/dependency-injection-composition-root.md`

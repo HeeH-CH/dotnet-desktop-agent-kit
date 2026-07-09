@@ -1,47 +1,50 @@
 # Workflow: Verify Change
 
-Use this after any meaningful change.
+## Goal
 
-Read the relevant rules first:
+Produce a factual verification report for code, docs, or template changes.
 
-- `rules/verification.md`
-- `rules/app-edge-boundaries.md`
-- `rules/result-taxonomy.md`
-- `rules/error-learning.md`
+## When to use
 
-## Checks
+Before final response, before PR, or after a risky refactor.
 
-1. Build
-2. Tests, if available
-3. Dependency direction
-4. Code-behind responsibility check
-5. ViewModel responsibility check
-6. Infrastructure leakage check
-7. App-edge authority check
-8. Result taxonomy check for user-visible actions
-9. Dead code or unused type check
-10. Public API surface check when library projects changed
-11. Runtime smoke when interactive confidence is required
+## Inputs
 
-## Final report
+- Changed files.
+- Commands run.
+- Available Roslyn MCP checks.
+- Expected architecture rules.
 
-```markdown
-## Verification Report
+## Steps
+
+1. Collect changed files.
+2. Run build/test when a code project exists.
+3. Run Roslyn MCP checks when available.
+4. Check Markdown links for docs changes.
+5. Check rules/skills/agents/workflows naming consistency.
+6. Scan for public-safety issues.
+7. Write verification table.
+
+## Roslyn MCP checks
+
+- Project graph.
+- Diagnostics.
+- Symbol references.
+- Forbidden dependency references.
+
+## Expected file changes
+
+- Verification report.
+- Docs updates if verification exposes inconsistencies.
+
+## Verification
 
 | Check | Result | Notes |
 |---|---|---|
-| Build | PASS/FAIL/SKIP | |
-| Tests | PASS/FAIL/SKIP | |
-| Dependency direction | PASS/FAIL | |
-| Code-behind | PASS/WARN/FAIL | |
-| ViewModel responsibilities | PASS/WARN/FAIL | |
-| Infrastructure leakage | PASS/WARN/FAIL | |
-| App-edge authority | PASS/WARN/FAIL/SKIP | |
-| Result taxonomy | PASS/WARN/FAIL/SKIP | |
-| Dead code | PASS/WARN/SKIP | |
-| Runtime smoke | PASS/FAIL/SKIP | |
+| Markdown links | pass/fail | docs scope |
+| README sync | pass/fail | EN/KO |
+| Public safety | pass/fail | sensitive info scan |
 
-## Verdict
+## Final report format
 
-READY / NEEDS FIXES
-```
+Verification table, changed files, not-run reasons, and risks.
