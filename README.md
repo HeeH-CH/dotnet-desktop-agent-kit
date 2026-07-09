@@ -109,9 +109,11 @@ View -> Command / Intent -> ViewModel -> UseCase -> Port -> Infrastructure Adapt
 AGENTS.md                         Main operating doctrine for agents
 CLAUDE.md                         Claude Code entrypoint
 .codex/AGENTS.md                  Codex CLI entrypoint
+.codex/config.toml                Codex project-scoped subagent settings
+.codex/agents/*.toml              Codex custom subagents for GPT/Codex CLI
 rules/                            Always-on architecture rules
 skills/*/SKILL.md                 Reusable task skills
-agents/*.md                       Specialist subagent definitions
+agents/*.md                       Source role prompts for specialist agents
 workflows/*.md                    Step-by-step Codex/agent workflows
 templates/                        Copyable project templates
 docs/concepts/                    Concept explanations
@@ -125,11 +127,12 @@ docs/examples/                    Small generic examples
 Use the kit as a set of coordinated surfaces:
 
 - `AGENTS.md` and `.codex/AGENTS.md` define operating rules for Codex and other coding agents.
+- `.codex/agents/*.toml` registers project-scoped Codex custom subagents for GPT/Codex CLI.
 - `CLAUDE.md`, `.opencode/AGENTS.md`, and Cursor rules give other tools lightweight entrypoints into the same guidance.
 - `rules/` contains always-on architectural constraints for desktop code.
 - `workflows/` contains repeatable procedures for feature work, refactoring, parallel-wave audits, runtime smoke checks, PR preparation, and verification.
 - `skills/` contains callable task guides for common desktop architecture work, including app-edge boundaries, result taxonomy, reducer/store design, composition/DI, and Roslyn MCP audits.
-- `agents/` defines specialist agents for architecture, refactoring, Graph integration, quality audit, testing, UI state review, documentation, and build fixes.
+- `agents/` defines source markdown role prompts for architecture, refactoring, Graph integration, quality audit, testing, UI state review, documentation, and build fixes.
 
 ## Quick start
 
@@ -154,6 +157,33 @@ Report changed files, architecture impact, verification, and risks.
 
 Use `.codex/AGENTS.md` as the Codex-specific routing file. It tells Codex to read root `AGENTS.md` first, prefer Roslyn MCP semantic checks when available, and avoid bash-only assumptions in Windows desktop repositories.
 
+For GPT/Codex CLI subagents, use the project-scoped custom agent TOML files under `.codex/agents/`:
+
+```text
+.codex/agents/build-fix-agent.toml
+.codex/agents/documentation-maintainer.toml
+.codex/agents/dotnet-desktop-architect.toml
+.codex/agents/graph-integration-specialist.toml
+.codex/agents/mvvm-mvi-refactorer.toml
+.codex/agents/quality-auditor.toml
+.codex/agents/test-strategy-agent.toml
+.codex/agents/ui-state-reviewer.toml
+```
+
+These TOML files are generated from the source markdown prompts under `agents/*.md` and include Codex-required fields: `name`, `description`, and `developer_instructions`. The project `.codex/config.toml` enables a bounded subagent setup:
+
+```toml
+[agents]
+max_threads = 6
+max_depth = 1
+```
+
+Example prompt:
+
+```text
+Use subagent dotnet-desktop-architect to plan the layer placement, then use quality-auditor to audit boundary risks.
+```
+
 ## Claude Code, Cursor, and OpenCode usage
 
 - Claude Code: use `CLAUDE.md` plus selected `skills/*/SKILL.md` files.
@@ -164,12 +194,12 @@ Use `.codex/AGENTS.md` as the Codex-specific routing file. It tells Codex to rea
 
 | Task | Agent | Skills | Rules | Workflow |
 |---|---|---|---|---|
-| Add a screen feature | `agents/dotnet-desktop-architect.md` | `skills/feature-planning/SKILL.md`, `skills/usecase-design/SKILL.md`, `skills/viewstate-design/SKILL.md` | `rules/architecture-boundaries.md`, `rules/mvi-state-flow.md` | `workflows/add-feature.md` |
-| Refactor a ViewModel | `agents/mvvm-mvi-refactorer.md` | `skills/mvvm-mvi-refactoring/SKILL.md`, `skills/screen-refactoring/SKILL.md` | `rules/viewmodel-responsibility.md`, `rules/usecase-boundaries.md` | `workflows/refactor-screen.md` |
-| Add Graph integration | `agents/graph-integration-specialist.md` | `skills/graph-adapter/SKILL.md`, `skills/usecase-design/SKILL.md` | `rules/infrastructure-adapters.md`, `rules/public-repo-safety.md` | `workflows/add-graph-integration.md` |
-| Audit a refactor | `agents/quality-auditor.md` | `skills/roslyn-mcp-audit/SKILL.md`, `skills/verification/SKILL.md` | `rules/verification.md`, `rules/testing-strategy.md` | `workflows/audit-architecture.md` |
-| Broad multi-area refactor | `agents/quality-auditor.md` plus scoped specialists | `skills/roslyn-mcp-audit/SKILL.md`, `skills/verification/SKILL.md` | `rules/parallel-wave.md`, `rules/error-learning.md` | `workflows/parallel-wave.md` |
-| Runtime smoke check | `agents/quality-auditor.md` | `skills/verification/SKILL.md` | `rules/app-edge-boundaries.md`, `rules/verification.md` | `workflows/runtime-smoke.md` |
+| Add a screen feature | `dotnet-desktop-architect` | `skills/feature-planning/SKILL.md`, `skills/usecase-design/SKILL.md`, `skills/viewstate-design/SKILL.md` | `rules/architecture-boundaries.md`, `rules/mvi-state-flow.md` | `workflows/add-feature.md` |
+| Refactor a ViewModel | `mvvm-mvi-refactorer` | `skills/mvvm-mvi-refactoring/SKILL.md`, `skills/screen-refactoring/SKILL.md` | `rules/viewmodel-responsibility.md`, `rules/usecase-boundaries.md` | `workflows/refactor-screen.md` |
+| Add Graph integration | `graph-integration-specialist` | `skills/graph-adapter/SKILL.md`, `skills/usecase-design/SKILL.md` | `rules/infrastructure-adapters.md`, `rules/public-repo-safety.md` | `workflows/add-graph-integration.md` |
+| Audit a refactor | `quality-auditor` | `skills/roslyn-mcp-audit/SKILL.md`, `skills/verification/SKILL.md` | `rules/verification.md`, `rules/testing-strategy.md` | `workflows/audit-architecture.md` |
+| Broad multi-area refactor | `quality-auditor` plus scoped specialists | `skills/roslyn-mcp-audit/SKILL.md`, `skills/verification/SKILL.md` | `rules/parallel-wave.md`, `rules/error-learning.md` | `workflows/parallel-wave.md` |
+| Runtime smoke check | `quality-auditor` | `skills/verification/SKILL.md` | `rules/app-edge-boundaries.md`, `rules/verification.md` | `workflows/runtime-smoke.md` |
 
 ## Roslyn MCP recommendation
 
