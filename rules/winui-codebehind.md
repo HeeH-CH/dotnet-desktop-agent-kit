@@ -1,43 +1,40 @@
-# WinUI/WPF Code-behind Rule
+# WinUI/WPF Code-Behind
 
 ## Intent
 
-Keep code-behind thin and view-only.
+Keep code-behind limited to view-only behavior.
 
-## Allowed in code-behind
+## Applies to
 
-- UI initialization
-- view-only event bridging when binding is not practical
-- visual tree concerns
-- focus management
-- window sizing and positioning
-- platform UI interop that cannot be expressed in XAML or ViewModel
+WinUI 3 and WPF pages, windows, user controls, and event handlers.
 
-## Not allowed in code-behind
+## Rule
 
-- business rules
-- API calls
-- persistence logic
-- Microsoft Graph calls
-- feature orchestration
-- domain decisions
-- long-running workflows
+Code-behind may initialize views, manage visual-tree-only concerns, or forward events to commands. Business decisions, IO, Graph calls, validation policy, and state transitions belong elsewhere.
+
+## Allowed
+
+- `InitializeComponent` and view-only setup.
+- Focus, animation, or visual tree glue.
+- Event handler that dispatches a ViewModel intent.
+
+## Not allowed
+
+- Microsoft Graph SDK calls from code-behind.
+- File parsing, auth, persistence, or business branching in event handlers.
+- Directly mutating controls after application operations.
+- Creating Infrastructure adapters from a Page or Window.
 
 ## Preferred pattern
 
-Move user actions into ViewModel commands or intent methods.
+Move event behavior to a ViewModel intent. If it includes IO or branching, extract a UseCase.
 
-```text
-Button click -> Command -> Intent -> UseCase -> ViewState update
-```
+## Anti-pattern
+
+A button click handler authenticates, calls Graph, maps DTOs, and updates UI controls.
 
 ## Agent verification
 
-Before editing code-behind, ask whether the logic belongs in:
-
-- ViewModel
-- UseCase
-- Domain model
-- Infrastructure adapter
-
-Only keep code in code-behind when it is truly view-specific.
+- List changed code-behind files.
+- Confirm handlers are view-only or intent dispatchers.
+- Check for SDK, IO, HTTP, auth, and business branching.

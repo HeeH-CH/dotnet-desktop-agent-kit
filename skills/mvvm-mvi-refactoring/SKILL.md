@@ -1,64 +1,54 @@
 ---
 name: mvvm-mvi-refactoring
-description: Refactors WinUI/WPF screens toward clean MVVM and MVI-style state flow.
+description: Refactor ViewModels toward explicit Intent -> UseCase -> Result -> ViewState flow.
 ---
 
-# MVVM + MVI Refactoring
+# MVVM MVI Refactoring
 
 ## Purpose
 
-Use this skill when code-behind is too large, ViewModels are doing too much, or UI state is scattered.
+Turn scattered command logic and mutable UI flags into clear state transitions while preserving MVVM.
 
-## Target shape
+## When to use
 
-```text
-View -> Command / Intent -> ViewModel -> UseCase -> Result -> ViewState
-```
+- A ViewModel has many services or flags.
+- Commands contain IO, SDK calls, or business branching.
+- UI state has invalid combinations.
 
-## Refactoring steps
+## Inputs
 
-1. List current code-behind responsibilities.
-2. Move user actions into commands or intent methods.
-3. Identify async workflows and extract UseCases.
-4. Replace scattered UI flags with a ViewState model.
-5. Make loading, error, empty, and success states explicit.
-6. Ensure ViewModel does not call external SDKs directly.
-7. Keep each step buildable.
+- Target ViewModel and XAML bindings.
+- Current commands and observable properties.
+- Available UseCases and ports.
 
-## ViewModel responsibilities
+## Process
 
-Allowed:
-
-- expose ViewState
-- expose commands
-- dispatch intents
-- call UseCases
-- translate UseCase results into ViewState
-
-Not allowed:
-
-- call Microsoft Graph directly
-- own business rules
-- own persistence details
-- own file/auth/http implementation details
+1. Inventory commands, properties, and injected services.
+2. Group user actions into intents.
+3. Design or normalize ViewState.
+4. Extract application work to UseCases.
+5. Map UseCase Result to ViewState in reducer-style methods.
+6. Preserve bindings or document required binding changes.
+7. Run build and ViewModel tests.
 
 ## Output format
 
-```markdown
-## MVVM/MVI Refactoring Plan
+Refactor plan, before/after responsibility table, changed state model, and verification result.
 
-### Current problems
-- ...
+## Anti-patterns
 
-### Proposed state flow
-- Intent: ...
-- UseCase: ...
-- Result: ...
-- ViewState: ...
+- Moving all logic into a bigger ViewModel.
+- Using ViewState as a bag of SDK DTOs.
+- Breaking bindings without documenting XAML changes.
 
-### Steps
-1. ...
+## Verification
 
-### Verification
-- ...
-```
+- Commands are intent-focused.
+- No Graph SDK or Infrastructure adapter in ViewModel.
+- Loading/error/empty states are representable.
+
+## Related rules
+
+- `rules/mvi-state-flow.md`
+- `rules/viewmodel-responsibility.md`
+- `rules/winui-codebehind.md`

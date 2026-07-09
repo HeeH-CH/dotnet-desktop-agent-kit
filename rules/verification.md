@@ -1,37 +1,40 @@
-# Verification Rule
+# Verification
 
 ## Intent
 
-Every meaningful agent change should leave the project easier to trust.
+Make every agent change auditable and prevent silent architecture regression.
 
-## Required report
+## Applies to
 
-After a feature, refactor, or fix, report:
+Code, docs, rules, skills, workflows, templates, and PRs.
 
-- build status
-- changed files
-- architecture boundary impact
-- ViewModel responsibility changes
-- UseCase changes
-- adapter changes
-- known risks
-- follow-up recommendations
+## Rule
 
-## Preferred checks
+Every meaningful change must report what was verified, what was not verified, and why.
 
-- `dotnet build`
-- `dotnet test` when tests exist
-- Roslyn diagnostics when available
-- project dependency graph
-- circular dependency detection
-- dead code detection
+## Allowed
 
-## Refactoring safety
+- `dotnet build` and `dotnet test` results.
+- Roslyn MCP project graph, diagnostics, references, and implementation checks.
+- Markdown link checks for docs changes.
+- Public-safety review for examples and templates.
 
-Prefer small, reversible steps. A refactoring step is good when:
+## Not allowed
 
-- the project still builds
-- behavior is intentionally preserved
-- responsibility moved in one direction only
-- names became clearer
-- no new external dependency leaked inward
+- Saying “looks good” without checks.
+- Hiding unavailable tooling.
+- Claiming tests passed when they were not run.
+
+## Preferred pattern
+
+Use a verification table with Check, Result, and Notes. Mark unavailable tools explicitly.
+
+## Anti-pattern
+
+Final report lists changed files but omits build, tests, architecture, and safety checks.
+
+## Agent verification
+
+- Ensure final report contains the required table.
+- Check each not-run item has a reason.
+- Confirm known risks are listed.

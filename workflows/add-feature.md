@@ -1,32 +1,56 @@
 # Workflow: Add Feature
 
-Use this when adding a new desktop app feature.
+## Goal
+
+Add a WinUI/WPF desktop feature without leaking business logic or external SDKs into Presentation.
+
+## When to use
+
+A new screen, command, integration-backed feature, or user-visible workflow is requested.
+
+## Inputs
+
+- Feature name and target screen.
+- Target framework: WinUI 3 or WPF.
+- External data needs.
+- Acceptance criteria.
 
 ## Steps
 
-1. Describe the user-visible action.
-2. Identify the target screen or ViewModel.
-3. Define the Intent.
-4. Define ViewState changes.
-5. Decide if a UseCase is needed.
-6. Decide if a Domain concept is needed.
-7. Decide if an Application port is needed.
-8. Implement or update Infrastructure adapters.
-9. Wire ViewModel to UseCase.
-10. Update View binding.
-11. Verify build and architecture boundaries.
+1. Read `AGENTS.md` and `.codex/AGENTS.md` when using Codex.
+2. Load `agents/dotnet-desktop-architect.md`.
+3. Define user intents and ViewState states.
+4. Decide if a UseCase is needed.
+5. Define Application DTOs and ports before Infrastructure.
+6. Implement or document Infrastructure adapter boundaries.
+7. Wire ViewModel command/intent to UseCase.
+8. Update View bindings.
+9. Verify build, tests, boundaries, and public safety.
 
-## Final report
+## Roslyn MCP checks
 
-```markdown
-## Feature Summary
+- Project graph before/after.
+- References from ViewModel to UseCase only.
+- Port implementations in Infrastructure.
+- Diagnostics and cycles.
 
-- Intent:
-- ViewState changes:
-- UseCases:
-- Ports:
-- Adapters:
-- Domain changes:
-- Risks:
-- Verification:
-```
+## Expected file changes
+
+- View/ViewModel/ViewState updates.
+- Application UseCase/port/DTO additions.
+- Infrastructure adapter addition if external IO is needed.
+- Tests and docs when applicable.
+
+## Verification
+
+| Check | Result | Notes |
+|---|---|---|
+| Build | pass/fail/not run | command and important output |
+| Tests | pass/fail/not run | scope |
+| Roslyn MCP | pass/fail/not available | checks performed |
+| Architecture boundaries | pass/fail | violations or none |
+| Public safety | pass/fail | generic examples only |
+
+## Final report format
+
+Summary, changed files, architecture impact, verification table, risks, and follow-ups.

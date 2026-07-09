@@ -1,46 +1,40 @@
-# Infrastructure Adapter Boundary
+# Infrastructure Adapters
 
 ## Intent
 
-Keep external systems replaceable and testable.
+Keep external systems replaceable and prevent SDK details from leaking into Presentation or Domain.
+
+## Applies to
+
+Microsoft Graph, auth, file access, local storage, external APIs, OS services.
 
 ## Rule
 
-External systems must be accessed through Application ports and Infrastructure adapters.
+Application defines ports; Infrastructure implements them. Infrastructure maps external DTOs and exceptions to application-level DTOs and errors.
 
-## External systems include
+## Allowed
 
-- Microsoft Graph
-- Planner
-- Calendar
-- To Do
-- authentication providers
-- file system
-- local cache
-- databases
-- HTTP APIs
+- `GraphCalendarGateway : ICalendarGateway` in Infrastructure.
+- Application ports returning app DTOs or Result models.
+- Failure mapping for throttled, permission denied, token expired, network unavailable, and unknown external failure.
+
+## Not allowed
+
+- ViewModel depends on `GraphServiceClient`.
+- Application exposes Graph SDK response types.
+- Domain references adapter implementations.
+- Raw SDK exceptions bubble to ViewState.
 
 ## Preferred pattern
 
-```text
-Application Port
-  ICalendarGateway
-  IPlannerGateway
-  IAuthTokenProvider
+Create a small port around the use case, not a mirror of the entire SDK.
 
-Infrastructure Adapter
-  GraphCalendarGateway
-  GraphPlannerGateway
-  MsalAuthTokenProvider
-```
+## Anti-pattern
 
-## Violations
-
-- ViewModel depends on `GraphServiceClient`.
-- UseCase constructs SDK clients.
-- Domain model contains external DTOs.
-- ViewState exposes SDK response objects.
+A generic `IGraphClientWrapper` that exposes most of the SDK and becomes an SDK tunnel.
 
 ## Agent verification
 
-Search for external SDK types outside Infrastructure. If found, propose a port and adapter extraction plan.
+- Find adapter implementations for each external port.
+- Check Graph SDK namespaces are Infrastructure-only.
+- Check errors are mapped before reaching Application/Presentation.

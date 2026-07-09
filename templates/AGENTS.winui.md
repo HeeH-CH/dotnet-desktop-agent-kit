@@ -1,31 +1,33 @@
-# AGENTS.md Template for WinUI Projects
+# AGENTS.md for a WinUI 3 Desktop App
 
-Use this template in a WinUI project.
+Use this file as the project-level agent guide for a WinUI 3 app.
 
 ## Architecture
 
-This project uses WinUI + MVVM + MVI-style state flow + Clean Architecture.
-
 ```text
-App -> Application -> Domain
-Infrastructure -> Application / Domain
+ExampleApp.App              WinUI 3 views, XAML, ViewModels, ViewState, commands
+ExampleApp.Application      UseCases, ports, DTOs, Result models
+ExampleApp.Domain           Pure domain concepts and rules
+ExampleApp.Infrastructure   Graph, auth, files, local storage, external APIs
 ```
 
-## Rules
+Dependency direction: `App -> Application -> Domain`, `Infrastructure -> Application / Domain`, `Domain -> no external dependencies`.
 
-- Keep code-behind view-only.
-- Keep ViewModels focused on state and intent dispatch.
-- Put workflows in Application UseCases.
-- Put external integrations behind Application ports.
-- Put Microsoft Graph and platform SDK implementations in Infrastructure.
-- Keep Domain pure.
+## WinUI rules
 
-## Flow
+- Code-behind is view-only.
+- ViewModels use CommunityToolkit.Mvvm or equivalent MVVM patterns.
+- ViewModel commands represent intents.
+- UseCases perform application orchestration.
+- Graph SDK, file IO, auth, and local storage implementations stay in Infrastructure.
+- Application and Domain must not reference `Microsoft.UI.Xaml`.
+
+## Default flow
 
 ```text
-View -> Command/Intent -> ViewModel -> UseCase -> Port -> Adapter -> Result -> ViewState
+View -> Command/Intent -> ViewModel -> UseCase -> Port -> Adapter -> Result -> ViewState -> View
 ```
 
 ## Verification
 
-After changes, report build status, layer impact, ViewModel changes, UseCase changes, adapter changes, and risks.
+Run or report `dotnet build`, `dotnet test`, and Roslyn MCP project graph/reference/diagnostic checks when available.

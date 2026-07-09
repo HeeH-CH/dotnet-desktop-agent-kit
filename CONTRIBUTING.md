@@ -1,41 +1,37 @@
 # Contributing
 
-Thanks for your interest in contributing.
+Thanks for helping improve .NET Desktop Agent Kit.
 
-This project is focused on AI-agent guidance for .NET desktop application development.
+This repository is for public, generic AI-agent guidance for .NET desktop application development. It is not a place for company-specific prompts or private implementation notes.
 
 ## Good contributions
 
-- WinUI/WPF-specific architecture rules
-- MVVM and MVI-style state management guidance
-- Clean Architecture for desktop application examples
-- Roslyn MCP workflows for C# refactoring
-- Microsoft Graph adapter boundary patterns
-- CommunityToolkit.Mvvm usage examples
-- Safer refactoring workflows for AI coding agents
+- WinUI/WPF-specific architecture rules.
+- MVVM and MVI-style state management guidance.
+- Clean Architecture examples for desktop apps.
+- Roslyn MCP workflows for C# refactoring.
+- Microsoft Graph/M365 adapter boundary patterns.
+- CommunityToolkit.Mvvm usage guidance.
+- Safer refactoring workflows for AI coding agents.
 
 ## Out of scope
 
-- Company-specific workflows
-- Tenant-specific Microsoft 365 settings
-- Real secrets, tokens, IDs, URLs, or internal system names
-- General backend-only ASP.NET Core templates unless they support desktop integration
-- Large framework debates without actionable guidance
+- Company-specific workflows.
+- Tenant-specific Microsoft 365 settings.
+- Real secrets, tokens, IDs, URLs, or internal system names.
+- Backend-only ASP.NET Core templates unless clearly connected to desktop integration.
 
 ## Contribution style
 
-Prefer concise, practical guidance. Every new rule or skill should answer:
+Every new rule or skill should answer: what problem this prevents, when an agent should use it, desired pattern, anti-pattern, and verification.
 
-1. What problem does this prevent?
-2. When should an agent use it?
-3. What is the desired pattern?
-4. What is the anti-pattern?
-5. How can the agent verify the result?
+Use small examples with generic namespaces such as `ExampleApp.Application.Calendar`, `ExampleApp.Infrastructure.Graph`, and `ExampleApp.App.ViewModels`.
 
 ## Pull request checklist
 
 - [ ] The change is generic and safe to publish.
 - [ ] No private/company/tenant-specific information is included.
 - [ ] The change improves desktop .NET agent behavior.
-- [ ] Related rules, skills, agents, or workflows were updated together.
+- [ ] Related rules, skills, agents, workflows, or docs were updated together.
 - [ ] Examples are small and reusable.
+- [ ] Links were checked where possible.

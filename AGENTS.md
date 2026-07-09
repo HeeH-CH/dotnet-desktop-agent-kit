@@ -1,21 +1,20 @@
 # AGENTS.md
 
-This repository defines an agent skill kit for .NET desktop application development.
+This repository defines the operating doctrine for a public, copyable .NET desktop AI coding-agent skill kit.
 
 ## Core objective
 
-Help AI coding agents build and refactor WinUI/WPF desktop applications using MVVM, MVI-style state flow, Clean Architecture, and Roslyn MCP-assisted analysis.
+Help AI coding agents build, extend, audit, and refactor WinUI/WPF desktop applications using MVVM, MVI-style intent/result/ViewState flow, Clean Architecture, Application UseCases and ports, Infrastructure adapters, and Roslyn MCP-assisted semantic analysis.
 
-## Core architecture
+## Architecture doctrine
 
-The default architecture has four conceptual layers:
+Keep the app shell thin. Keep ViewModels focused on state and user intents. Put business/application workflows in Application UseCases. Define external system boundaries as Application ports. Implement those ports in Infrastructure. Keep Domain pure.
 
-- App / Presentation
-- Application
-- Domain
-- Infrastructure
+```text
+View -> Command / Intent -> ViewModel -> UseCase -> Port -> Infrastructure Adapter -> Result -> Reducer / State update -> ViewState -> View
+```
 
-Dependency direction must remain inward.
+Dependency direction is non-negotiable:
 
 ```text
 App -> Application -> Domain
@@ -27,73 +26,19 @@ Domain -> no external dependencies
 
 ### App / Presentation
 
-Owns:
-
-- WinUI/WPF views
-- XAML
-- code-behind limited to view-only concerns
-- ViewModels
-- ViewState
-- Commands
-- Intent dispatching
-- UI composition and navigation
-
-Must not own:
-
-- business rules
-- Microsoft Graph SDK calls
-- persistence logic
-- HTTP/file/auth implementation details
+Owns WinUI/WPF Views, XAML, UI-only resources, ViewModels, ViewState, commands, intent dispatching, navigation, and UI composition. It must not own business rules, Graph SDK calls, persistence implementation, or raw external SDK DTOs in ViewState.
 
 ### Application
 
-Owns:
-
-- UseCases
-- application services
-- ports/interfaces for external systems
-- DTOs and application models
-- orchestration
-- validation
-- application-level Result models
-
-Must not reference:
-
-- WinUI/WPF types
-- Infrastructure implementations
-- Microsoft Graph SDK directly
+Owns UseCases, ports/interfaces such as `ICalendarGateway`, `IPlannerGateway`, `ITodoGateway`, `IUserProfileGateway`, `IAuthTokenProvider`, request/response DTOs, orchestration, validation, cancellation propagation, and application-level Result/Error models. It must not reference WinUI/WPF, Infrastructure implementations, Microsoft Graph SDK, ViewModels, or XAML concepts.
 
 ### Domain
 
-Owns:
-
-- pure business concepts
-- value objects
-- domain rules
-- domain models
-- domain errors
-
-Must not reference:
-
-- WinUI/WPF
-- Microsoft Graph
-- HTTP clients
-- databases
-- file systems
-- dependency injection frameworks
+Owns pure business concepts, value objects, domain rules, framework-independent models, and domain errors. It must not reference Presentation, Application implementation details, Infrastructure, SDKs, databases, file systems, OS APIs, or DI containers.
 
 ### Infrastructure
 
-Owns:
-
-- Microsoft Graph adapter implementations
-- authentication adapters
-- local storage adapters
-- file system adapters
-- HTTP clients
-- platform-specific service implementations
-
-Infrastructure implements ports defined by Application or Domain.
+Owns Microsoft Graph adapter implementations, authentication/token providers, local storage, file access, external API clients, and mapping from external DTOs/exceptions to Application DTOs/errors. Infrastructure implements ports defined by Application or Domain and must not define UI state.
 
 ## Non-negotiable rules
 
@@ -101,105 +46,93 @@ Infrastructure implements ports defined by Application or Domain.
 - Do not call Microsoft Graph SDK directly from ViewModels.
 - Do not reference WinUI/WPF types from Application or Domain.
 - Do not reference Infrastructure from Domain.
+- Do not expose external SDK DTOs in ViewState.
+- Do not treat Clean Architecture as folder naming only.
+- Do not introduce backend-only ASP.NET Core assumptions into desktop guidance.
 - Use Application ports for external systems.
-- Use UseCases for user-visible business actions.
-- Use ViewState to represent screen state explicitly.
-- Use Intent-style methods or commands for user actions.
-- Keep each refactoring step buildable.
-- Prefer small, reversible changes.
+- Use UseCases for user-visible actions that involve IO, validation, branching, integration, or orchestration.
+- Propagate `CancellationToken` through async UseCase and adapter calls.
+- Keep examples generic and public-safe.
+
+## Allowed and disallowed dependencies
+
+| From | Allowed | Not allowed |
+|---|---|---|
+| App / Presentation | Application, Domain, UI framework, CommunityToolkit.Mvvm | Graph SDK in ViewModels; business calls to Infrastructure implementations |
+| Application | Domain, BCL abstractions, application ports | WinUI/WPF, Infrastructure, Graph SDK, external SDK DTO contracts |
+| Domain | BCL and domain-owned types | Application, Infrastructure, UI, SDKs, DI containers |
+| Infrastructure | Application, Domain, external SDKs, OS/file/auth APIs | App/ViewModel references, ViewState, UI controls |
 
 ## MVI-style flow
 
-User interaction should follow this flow:
+1. View raises a command or event.
+2. ViewModel converts it to an explicit intent method.
+3. ViewModel updates ViewState to loading/optimistic state.
+4. ViewModel calls an Application UseCase.
+5. UseCase calls ports and returns Result.
+6. ViewModel reduces Result into ViewState.
+7. View observes ViewState through binding.
 
-```text
-View
- -> Command / Intent
- -> ViewModel
- -> UseCase
- -> Port
- -> Infrastructure Adapter
- -> Result
- -> Reducer / State update
- -> ViewState
- -> View
-```
+## Roslyn MCP usage policy
 
-## Roslyn MCP usage
+When Roslyn MCP is available, prefer it before broad textual edits for C# code. Check project graph, symbol references, port/interface implementations, circular dependencies, diagnostics, dead code, public API surface, ViewModel references to Infrastructure or Graph SDK namespaces, Application/Domain references to WinUI/WPF namespaces, and Infrastructure DTO leakage into ViewState.
 
-Before large changes, use Roslyn-based analysis where available:
+If Roslyn MCP is unavailable, fall back to compiler diagnostics, `dotnet build`, `dotnet test`, and targeted text search. Report that semantic checks were unavailable.
 
-- inspect project dependency graph
-- find symbol references
-- find implementations of ports
-- detect circular dependencies
-- inspect diagnostics
-- detect dead code
-- inspect public API surface
+## Agent routing table
 
-Prefer semantic analysis over blind text search.
+| Situation | Primary agent |
+|---|---|
+| Choose architecture or layer placement | `agents/dotnet-desktop-architect.md` |
+| Clean ViewModel or code-behind | `agents/mvvm-mvi-refactorer.md` |
+| Add Microsoft Graph/M365 integration | `agents/graph-integration-specialist.md` |
+| Fix build or project references | `agents/build-fix-agent.md` |
+| Review UI state correctness | `agents/ui-state-reviewer.md` |
+| Design test strategy | `agents/test-strategy-agent.md` |
+| Maintain docs, rules, or workflows | `agents/documentation-maintainer.md` |
+| Audit after refactor | `agents/quality-auditor.md` |
 
-## Agent roles
+## Skill loading guide
 
-### dotnet-desktop-architect
-
-Use for project structure, architecture boundaries, dependency direction, module placement, and deciding whether a feature belongs in App, Application, Domain, or Infrastructure.
-
-### mvvm-mvi-refactorer
-
-Use for ViewModel cleanup, code-behind removal, ViewState design, Intent design, Command design, and UI state consistency.
-
-### graph-integration-specialist
-
-Use for Microsoft Graph, Planner, Calendar, To Do, authentication, Graph DTO mapping, permission errors, and adapter boundaries.
-
-### quality-auditor
-
-Use for architecture audits, dependency violations, circular dependencies, dead code, naming inconsistencies, missing tests, and refactoring progress reports.
-
-### build-fix-agent
-
-Use for build errors, nullable warnings, package conflicts, project references, and compiler diagnostics.
+Load only the skills needed for the task. Feature work usually uses `skills/feature-planning/SKILL.md`, `skills/usecase-design/SKILL.md`, and `skills/viewstate-design/SKILL.md`. Refactoring usually uses `skills/mvvm-mvi-refactoring/SKILL.md`, `skills/screen-refactoring/SKILL.md`, and `skills/verification/SKILL.md`. Graph work uses `skills/graph-adapter/SKILL.md`. Audits use `skills/roslyn-mcp-audit/SKILL.md`.
 
 ## Feature development workflow
 
-When adding a new feature:
-
-1. Identify the user action and screen impact.
-2. Define the Intent.
-3. Define or reuse the ViewState.
-4. Decide whether a UseCase is required.
-5. If external data is needed, define an Application Port.
-6. Implement the Infrastructure Adapter.
-7. Wire the ViewModel to the UseCase.
-8. Update the View binding.
-9. Verify build and dependency direction.
-10. Summarize the architectural impact.
+1. Identify the screen, user intent, and resulting state changes.
+2. Load `workflows/add-feature.md`.
+3. Decide whether the feature needs a UseCase.
+4. Define Application request/response models and ports before Infrastructure.
+5. Keep external SDK DTOs inside Infrastructure.
+6. Update ViewModel intents and ViewState.
+7. Bind the View to ViewState.
+8. Verify architecture, build, tests, links, and public safety.
 
 ## Refactoring workflow
 
-When refactoring existing code:
+1. Load `workflows/refactor-screen.md` or `workflows/migrate-code-behind.md`.
+2. Audit current responsibilities before editing.
+3. Use Roslyn MCP to find references and dependency violations when available.
+4. Move business/application flow to UseCases.
+5. Move SDK/file/auth/local-storage code to Infrastructure adapters.
+6. Replace scattered state flags with ViewState.
+7. Keep changes small and reversible.
+8. Document remaining debt.
 
-1. Audit current responsibilities.
-2. Identify code-behind logic.
-3. Identify ViewModel overreach.
-4. Identify direct Infrastructure usage from App/Application.
-5. Extract UseCases first.
-6. Extract Ports next.
-7. Move Graph/file/auth code to Infrastructure.
-8. Replace scattered mutable UI flags with explicit ViewState.
-9. Keep each step buildable.
-10. Document remaining debt.
+## Verification output format
 
-## Verification output
+```markdown
+## Verification
 
-After any meaningful change, report:
+| Check | Result | Notes |
+|---|---|---|
+| Build | pass/fail/not run | command and important output |
+| Tests | pass/fail/not run | scope |
+| Roslyn MCP | pass/fail/not available | project graph, references, diagnostics |
+| Architecture boundaries | pass/fail | violations or none |
+| ViewState/Intent flow | pass/fail | screen impact |
+| Public safety | pass/fail | sensitive info check |
+```
 
-- Build status
-- Changed files
-- Architecture boundary impact
-- ViewModel responsibility changes
-- UseCase changes
-- Adapter changes
-- Known risks
-- Follow-up recommendations
+## Public repo safety rules
+
+Never include company names, internal product names, tenant IDs, client secrets, real client IDs, private redirect URIs, private M365 organization details, private email addresses, production URLs, internal endpoints, screenshots with private data, or secrets hidden in examples. Use generic names such as `ExampleApp`, `ExampleGraphAdapter`, `YOUR_TENANT_ID`, `YOUR_CLIENT_ID`, and `example.invalid`.

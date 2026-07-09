@@ -2,34 +2,44 @@
 
 ## Role
 
-Architecture and code quality auditor for .NET desktop projects.
+Architecture and verification auditor for desktop agent changes.
 
 ## Use when
 
-- performing mid-refactor audits
-- checking Clean Architecture maturity
-- finding dependency violations
-- identifying dead code or cycles
-- reviewing AI-generated changes
+- Before final report.
+- Mid-refactor review.
+- Checking boundary violations, dead code, cycles, diagnostics, tests, and public safety.
+
+## Do not use when
+
+- The task needs immediate implementation before findings are known.
+- No files or architecture decisions changed.
+
+## Load these rules
+
+- `rules/verification.md`
+- `rules/architecture-boundaries.md`
+- `rules/testing-strategy.md`
+- `rules/public-repo-safety.md`
+- `rules/naming-and-folder-conventions.md`
+
+## Load these skills
+
+- `skills/roslyn-mcp-audit/SKILL.md`
+- `skills/verification/SKILL.md`
+- `skills/testing-strategy/SKILL.md`
 
 ## Preferred tools
 
-Use Roslyn MCP where available:
-
-- project graph
-- symbol references
-- implementations
-- diagnostics
-- circular dependencies
-- dead code
-- public API surface
+- Roslyn MCP diagnostics, references, and project graph.
+- `dotnet build` and `dotnet test`.
+- Markdown link checks.
 
 ## Output expectations
 
-Return a prioritized report:
+Return an audit table with severity, evidence, location, recommendation, and status.
 
-1. Critical boundary violations
-2. ViewModel/code-behind problems
-3. Infrastructure leakage
-4. Testability issues
-5. Low-risk cleanup opportunities
+## Failure modes to avoid
+
+- Claiming Roslyn MCP results when unavailable.
+- Hiding not-run checks.

@@ -1,58 +1,54 @@
 ---
 name: graph-adapter
-description: Designs Microsoft Graph adapter boundaries for .NET desktop applications.
+description: Design Microsoft Graph/M365 integrations behind Application ports and Infrastructure adapters.
 ---
 
-# Microsoft Graph Adapter Skill
+# Graph Adapter
 
 ## Purpose
 
-Use this skill when adding or refactoring Microsoft Graph integration in a desktop app.
+Keep Graph SDK, auth details, throttling, and external DTOs out of ViewModels and Domain.
 
-## Core rule
+## When to use
 
-Microsoft Graph SDK belongs in Infrastructure. Application defines ports. ViewModels call UseCases.
+- Adding Calendar, Planner, To Do, user profile, or auth integration.
+- A ViewModel currently calls Graph.
+- Raw Graph errors appear in UI.
 
-```text
-ViewModel -> UseCase -> ICalendarGateway -> GraphCalendarGateway -> Microsoft Graph SDK
-```
+## Inputs
 
-## Common ports
+- User intent and required Graph capability.
+- Application UseCase.
+- Port candidates.
+- Expected failure modes.
 
-```csharp
-public interface ICalendarGateway
-{
-    Task<IReadOnlyList<CalendarEventDto>> GetEventsAsync(DateRange range, CancellationToken ct);
-}
+## Process
 
-public interface IPlannerGateway
-{
-    Task<IReadOnlyList<PlannerTaskDto>> GetTasksAsync(CancellationToken ct);
-}
-```
+1. Name the Application port by capability, not SDK endpoint.
+2. Define minimal request/response DTOs.
+3. Model failures: throttled, permission denied, token expired, network unavailable, not found, unknown.
+4. Implement adapter in Infrastructure.
+5. Map SDK DTOs and exceptions inside the adapter.
+6. Return application-level Result to UseCase and ViewModel.
+7. Add tests or test plan for mapping and failures.
 
-## Error handling
+## Output format
 
-Graph failures should be translated into application-level errors:
-
-- permission denied
-- token expired
-- network unavailable
-- throttled
-- resource not found
-- unknown external failure
-
-Do not expose raw SDK exceptions to ViewModels.
-
-## Mapping guidance
-
-- Graph SDK model -> Infrastructure DTO or adapter result
-- Infrastructure DTO -> Application DTO or domain-friendly model
-- Application result -> ViewState
+Port/adapter design, DTO mapping, failure model, and verification checklist.
 
 ## Anti-patterns
 
-- `GraphServiceClient` injected into a ViewModel.
-- ViewState containing Graph SDK response types.
-- UseCase catching raw SDK exceptions in many places.
-- Authentication logic duplicated across adapters.
+- Creating an `IGraphService` that mirrors the full SDK.
+- Letting `GraphServiceClient` or SDK models reach ViewState.
+- Using real tenant/client values in docs.
+
+## Verification
+
+- Graph SDK namespaces are Infrastructure-only.
+- Application sees only ports and app DTOs.
+- ViewState has no external DTOs.
+
+## Related rules
+
+- `rules/infrastructure-adapters.md`
+- `rules/public-repo-safety.md`
